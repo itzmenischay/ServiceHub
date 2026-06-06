@@ -7,16 +7,15 @@ import { generateAccessToken } from "../utils/generateToken.js";
 
 import { sendOTPEmail } from "../services/emailService.js";
 
+import AppError from "../utils/AppError.js";
+
 // Register User
 export const registerUser = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
+      return next(new AppError("All fields are required", 400));
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -26,10 +25,7 @@ export const registerUser = async (req, res, next) => {
     });
 
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "User already exists",
-      });
+      return next(new AppError("User already exists", 409))
     }
 
     await PendingUser.deleteOne({
@@ -68,10 +64,7 @@ export const verifyOTP = async (req, res, next) => {
     const { email, otp } = req.body;
 
     if (!email || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and OTP are required",
-      });
+      return next(new AppError("Email and OTP are required", 400));
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -81,17 +74,11 @@ export const verifyOTP = async (req, res, next) => {
     });
 
     if (!pendingUser) {
-      return res.status(404).json({
-        success: false,
-        message: "No pending registration found",
-      });
+      return next(new AppError("No pending registration found", 404))
     }
 
     if (pendingUser.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid OTP",
-      });
+      return next(new AppError("Invalid OTP", 400))
     }
 
     if (pendingUser.otpExpiry < new Date()) {
@@ -99,10 +86,7 @@ export const verifyOTP = async (req, res, next) => {
         email: normalizedEmail,
       });
 
-      return res.status(400).json({
-        success: false,
-        message: "OTP has expired",
-      });
+      return next(new AppError("OTP has expired", 400));
     }
 
     const user = await User.create({
@@ -140,10 +124,7 @@ export const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
+      return next(new AppError("Email and password are required", 400))
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -153,26 +134,17 @@ export const loginUser = async (req, res, next) => {
     }).select("+password");
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      return next(new AppError("Invalid Credentials", 400))
     }
 
     if (user.isBlocked) {
-      return res.status(403).json({
-        success: false,
-        message: "Account has been blocked",
-      });
+      return next(new AppError("Account has been blocked", 403))
     }
 
     const isMatch = await comparePassword(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      return next(new AppError("Invalid Credentials", 400))
     }
 
     const token = generateAccessToken({

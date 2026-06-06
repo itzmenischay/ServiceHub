@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
+import errorMiddleware from "./middleware/errorMiddleware.js";
+import AppError from "./utils/AppError.js";
 
 const app = express();
 
@@ -18,6 +20,14 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+
+// 404 handler
+app.all("/*splat", (req, res, next) => {
+  next(new AppError(`Route ${req.originalUrl} not found`, 404));
+});
+
+// Global error middleware
+app.use(errorMiddleware);
 
 app.get("/", (req, res) => {
   res.send("ServiceHub API running...");
