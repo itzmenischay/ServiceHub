@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import AppError from "./utils/AppError.js";
+import providerRoutes from "./routes/providerRoutes.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+app.use("/api/providers", providerRoutes);
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {
