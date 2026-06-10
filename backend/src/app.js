@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import AppError from "./utils/AppError.js";
 import providerRoutes from "./routes/providerRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/providers", providerRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {
