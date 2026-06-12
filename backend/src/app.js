@@ -8,6 +8,7 @@ import providerRoutes from "./routes/providerRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import marketplaceRoutes from "./routes/marketplaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
@@ -37,6 +38,9 @@ app.use("/api/marketplace", marketplaceRoutes);
 
 // Booking Routes
 app.use("/api/bookings", bookingRoutes);
+
+// Review Routes
+app.use("/api/reviews", reviewRoutes);
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {
