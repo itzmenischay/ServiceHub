@@ -6,6 +6,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import AppError from "./utils/AppError.js";
 import providerRoutes from "./routes/providerRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import marketplaceRoutes from "./routes/marketplaceRoutes.js";
 
 const app = express();
 
@@ -21,9 +22,17 @@ app.use(
   }),
 );
 
+// Authentication Routes
 app.use("/api/auth", authRoutes);
+
+// Provider Routes
 app.use("/api/providers", providerRoutes);
+
+// Category Routes
 app.use("/api/categories", categoryRoutes);
+
+// Marketplace Routes
+app.use("/api/marketplace", marketplaceRoutes);
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {

@@ -18,26 +18,31 @@ const providerProfileSchema = new mongoose.Schema(
     bio: {
       type: String,
       default: "",
+      trim: true,
     },
 
     experience: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     hourlyRate: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     location: {
       type: String,
       required: true,
+      trim: true,
     },
 
     skills: [
       {
         type: String,
+        trim: true,
       },
     ],
 
@@ -46,14 +51,23 @@ const providerProfileSchema = new mongoose.Schema(
       default: "",
     },
 
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ServiceCategory",
+      required: true,
+    },
+
     averageRating: {
       type: Number,
       default: 0,
+      min: 0,
+      max: 5,
     },
 
     totalReviews: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     isVerified: {
