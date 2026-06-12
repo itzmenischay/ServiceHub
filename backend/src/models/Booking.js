@@ -1,0 +1,63 @@
+import mongoose from "mongoose";
+
+const bookingSchema = new mongoose.Schema(
+  {
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    provider: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    providerProfile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProviderProfile",
+      required: true,
+    },
+
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ServiceCategory",
+      required: true,
+    },
+
+    serviceDate: {
+      type: Date,
+      required: true,
+    },
+
+    address: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    amount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected", "completed", "cancelled"],
+      default: "pending",
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export default mongoose.model("Booking", bookingSchema);

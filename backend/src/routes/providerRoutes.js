@@ -4,12 +4,11 @@ import {
   getMyProviderProfile,
   updateProviderProfile,
 } from "../controllers/providerController.js";
-
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-router.post("/", protect, createProviderProfile);
-router.get("/me", protect, getMyProviderProfile);
-router.put("/", protect, updateProviderProfile);
+router.post("/", protect, authorize("provider"), createProviderProfile);
+router.get("/me", protect, authorize("provider"), getMyProviderProfile);
+router.put("/", protect, authorize("provider"), updateProviderProfile);
 
 export default router;
