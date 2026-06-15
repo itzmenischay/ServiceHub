@@ -39,6 +39,11 @@ const userSchema = new mongoose.Schema(
       default: "customer",
     },
 
+    lastSeen: {
+      type: Date,
+      default: Date.now,
+    },
+
     isBlocked: {
       type: Boolean,
       default: false,
@@ -46,7 +51,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);
