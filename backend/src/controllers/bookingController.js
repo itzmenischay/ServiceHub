@@ -4,9 +4,34 @@ import AppError from "../utils/AppError.js";
 // Create Booking
 export const createBooking = async (req, res, next) => {
   try {
+    const { providerId, categoryId, serviceDate, address, description, hours } =
+      req.body;
+
+    // find provider profile
+    const providerProfile = await ProviderProfile.findOne({
+      user: providerId,
+    });
+
+    if (!providerProfile) {
+      return next(new AppError("Provider profile not found", 404));
+    }
+
+    // calculate pricing
+    const hourlyRate = providerProfile.hourlyRate;
+    const amount = hourlyRate * hours;
+
+    // create booking
     const booking = await Booking.create({
       customer: req.user._id,
-      ...req.body,
+      provider: providerId,
+      providerProfile: providerProfile._id,
+      category: categoryId,
+      serviceDate,
+      address,
+      description,
+      hours,
+      hourlyRateAtBookingTime: hourlyRate,
+      amount,
     });
 
     res.status(201).json({
@@ -28,7 +53,8 @@ export const getMyBookings = async (req, res, next) => {
       .populate("provider", "name email")
       .populate("providerProfile")
       .populate("category", "name")
-      .sort("-createdAt");
+      .populate("paymentId")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -47,8 +73,10 @@ export const getProviderBookings = async (req, res, next) => {
       provider: req.user._id,
     })
       .populate("customer", "name email")
+      .populate("providerProfile")
       .populate("category", "name")
-      .sort("-createdAt");
+      .populate("paymentId")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,

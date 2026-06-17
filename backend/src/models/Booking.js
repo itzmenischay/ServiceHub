@@ -43,6 +43,18 @@ const bookingSchema = new mongoose.Schema(
       trim: true,
     },
 
+    hours: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
+    hourlyRateAtBookingTime: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
     amount: {
       type: Number,
       required: true,
@@ -53,6 +65,18 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "accepted", "rejected", "completed", "cancelled"],
       default: "pending",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "refunded"],
+      default: "pending",
+    },
+
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      default: null,
     },
   },
   {

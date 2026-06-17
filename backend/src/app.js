@@ -9,7 +9,9 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import marketplaceRoutes from "./routes/marketplaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js"
+import messageRoutes from "./routes/messageRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import earningRoutes from "./routes/earningRoutes.js"
 
 const app = express();
 
@@ -44,7 +46,13 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/reviews", reviewRoutes);
 
 // Message Routes
-app.use("/api/messages", messageRoutes)
+app.use("/api/messages", messageRoutes);
+
+// Payment Routes
+app.use("/api/payments", paymentRoutes);
+
+// Earning Routes
+app.use("/api/earnings", earningRoutes)
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {
