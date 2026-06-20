@@ -3,6 +3,7 @@ import Payment from "../models/Payment.js";
 import Booking from "../models/Booking.js";
 import razorpay from "../config/razorpay.js";
 import AppError from "../utils/AppError.js";
+import { createNotification } from "../services/notificationService.js";
 
 // Create Payment Order
 export const createPaymentOrder = async (req, res, next) => {
@@ -121,6 +122,14 @@ export const verifyPayment = async (req, res, next) => {
 
     await booking.save();
 
+    await createNotification({
+      recipient: payment.provider,
+      sender: payment.customer,
+      type: "payment",
+      title: "Payment Received",
+      message: `${payment.amount} payment received successfully.`,
+    });
+
     res.status(200).json({
       success: true,
       message: "Payment verified successfully",
@@ -192,6 +201,13 @@ export const refundPayment = async (req, res, next) => {
       await booking.save();
     }
 
+    await createNotification({
+      recipient: payment.customer,
+      type: "payment",
+      title: "Refund Processed",
+      messaeg: "Your payment has been refunded.",
+    });
+
     res.status(200).json({
       success: true,
       message: "Payment refunded successfully",
@@ -202,5 +218,3 @@ export const refundPayment = async (req, res, next) => {
     next(error);
   }
 };
-
-// 

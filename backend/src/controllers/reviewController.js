@@ -3,6 +3,7 @@ import Review from "../models/Review.js";
 import Booking from "../models/Booking.js";
 import ProviderProfile from "../models/ProviderProfile.js";
 import AppError from "../utils/AppError.js";
+import { createNotification } from "../services/notificationService.js";
 
 // Create Review
 export const createReview = async (req, res, next) => {
@@ -75,6 +76,14 @@ export const createReview = async (req, res, next) => {
         totalReviews: stats[0].totalReviews,
       },
     );
+
+    await createNotification({
+      recipient: booking.provider,
+      sender: req.user._id,
+      type: "review",
+      title: "New Review",
+      message: "A customer has left a review on your profile."
+    })
 
     res.status(201).json({
       success: true,

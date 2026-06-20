@@ -1,9 +1,15 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/authRoutes.js";
+
+// Middleware Imports
 import errorMiddleware from "./middleware/errorMiddleware.js";
+
+// Utils Impots
 import AppError from "./utils/AppError.js";
+
+// Route imports
+import authRoutes from "./routes/authRoutes.js";
 import providerRoutes from "./routes/providerRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import marketplaceRoutes from "./routes/marketplaceRoutes.js";
@@ -13,6 +19,7 @@ import messageRoutes from "./routes/messageRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import earningRoutes from "./routes/earningRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = express();
 
@@ -57,6 +64,9 @@ app.use("/api/earnings", earningRoutes);
 
 // Admin Routes
 app.use("/api/admin", adminRoutes);
+
+// Notificaiton Routes
+app.use("/api/notifications", notificationRoutes);
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {

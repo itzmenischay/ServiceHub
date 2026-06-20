@@ -1,4 +1,5 @@
 import Booking from "../models/Booking.js";
+import { createNotification } from "../services/notificationService.js";
 import AppError from "../utils/AppError.js";
 
 // Create Booking
@@ -32,6 +33,14 @@ export const createBooking = async (req, res, next) => {
       hours,
       hourlyRateAtBookingTime: hourlyRate,
       amount,
+    });
+
+    await createNotification({
+      recipient: provider._id,
+      sender: req.user._id,
+      type: "booking",
+      title: "New Booking Request",
+      message: "You have received a new booking request.",
     });
 
     res.status(201).json({
@@ -101,6 +110,14 @@ export const acceptBooking = async (req, res, next) => {
 
     await booking.save();
 
+    await createNotification({
+      recipient: booking.customer,
+      sender: req.user._id,
+      type: "booking",
+      title: "Booking Accepted",
+      message: "Your booking has been accepted.",
+    });
+
     res.status(200).json({
       success: true,
       message: "Booking accepted",
@@ -123,6 +140,14 @@ export const rejectBooking = async (req, res, next) => {
     booking.status = "rejected";
 
     await booking.save();
+
+    await createNotification({
+      recipient: booking.customer,
+      sender: req.user._id,
+      type: "booking",
+      title: "Booking Rejected",
+      message: "Your booking request has been rejected.",
+    });
 
     res.status(200).json({
       success: true,
@@ -147,6 +172,14 @@ export const completeBooking = async (req, res, next) => {
 
     await booking.save();
 
+    await createNotification({
+      recipient: booking.customer,
+      sender: req.user._id,
+      type: "booking",
+      title: "Service Completed",
+      message: "Your service has been marked as completed.",
+    });
+
     res.status(200).json({
       success: true,
       message: "Booking completed",
@@ -169,6 +202,14 @@ export const cancelBooking = async (req, res, next) => {
     booking.status = "cancelled";
 
     await booking.save();
+
+    await createNotification({
+      recipient: provider._id,
+      sender: req.user._id,
+      type: "booking",
+      title: "Booking Cancelled",
+      message: "A booking has been cancelled.",
+    });
 
     res.status(200).json({
       success: true,
