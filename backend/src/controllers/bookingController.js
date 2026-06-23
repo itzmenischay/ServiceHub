@@ -1,4 +1,5 @@
 import Booking from "../models/Booking.js";
+import ProviderProfile from "../models/ProviderProfile.js";
 import { createNotification } from "../services/notificationService.js";
 import AppError from "../utils/AppError.js";
 
@@ -36,7 +37,7 @@ export const createBooking = async (req, res, next) => {
     });
 
     await createNotification({
-      recipient: provider._id,
+      recipient: booking.provider,
       sender: req.user._id,
       type: "booking",
       title: "New Booking Request",
@@ -204,7 +205,7 @@ export const cancelBooking = async (req, res, next) => {
     await booking.save();
 
     await createNotification({
-      recipient: provider._id,
+      recipient: booking.provider,
       sender: req.user._id,
       type: "booking",
       title: "Booking Cancelled",

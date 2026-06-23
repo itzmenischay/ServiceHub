@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 import Message from "../models/Message.js";
 import Booking from "../models/Booking.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 import AppError from "../utils/AppError.js";
+import { createNotification } from "../services/notificationService.js";
 
 // Send Message
 export const sendMessage = async (req, res, next) => {
@@ -50,6 +52,15 @@ export const sendMessage = async (req, res, next) => {
 
     // populate sender info
     await newMessage.populate("sender", "name email");
+
+    // Create notification
+    await createNotification({
+      recipient: receiverId,
+      sender: req.user._id,
+      type: "message",
+      title: "New Message",
+      message: `${req.user.name} sent you a message`,
+    });
 
     res.status(201).json({
       success: true,

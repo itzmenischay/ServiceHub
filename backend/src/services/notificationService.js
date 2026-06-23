@@ -1,5 +1,5 @@
 import Message from "../models/Message.js";
-import Notifications from "../models/Notification.js";
+import Notification from "../models/Notification.js";
 
 export const createNotification = async ({
   recipient,
@@ -8,7 +8,7 @@ export const createNotification = async ({
   title,
   message,
 }) => {
-  return await Notificaiton.create({
+  const notification =  await Notification.create({
     recipient,
     sender,
     type,
