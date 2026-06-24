@@ -20,6 +20,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import earningRoutes from "./routes/earningRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import availabilityRoutes from "./routes/availabilityRoutes.js"
 
 const app = express();
 
@@ -67,6 +68,9 @@ app.use("/api/admin", adminRoutes);
 
 // Notificaiton Routes
 app.use("/api/notifications", notificationRoutes);
+
+// Availability Routes
+app.use("/api/availability", availabilityRoutes)
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {
