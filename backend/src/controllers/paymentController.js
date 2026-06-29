@@ -4,6 +4,10 @@ import Booking from "../models/Booking.js";
 import razorpay from "../config/razorpay.js";
 import AppError from "../utils/AppError.js";
 import { createNotification } from "../services/notificationService.js";
+import {
+  sendPaymentSuccessEmail,
+  sendRefundProcessedEmail,
+} from "../services/emailService.js";
 
 // Create Payment Order
 export const createPaymentOrder = async (req, res, next) => {
@@ -111,7 +115,9 @@ export const verifyPayment = async (req, res, next) => {
     await payment.save();
 
     // Update booking
-    const booking = await Booking.findById(payment.booking);
+    const booking = await Booking.findById(payment.booking)
+      .populate("customer", "name email")
+      .populate("provider", "name email");
 
     if (!booking) {
       return next(new AppError("Booking not found", 404));
@@ -128,6 +134,16 @@ export const verifyPayment = async (req, res, next) => {
       type: "payment",
       title: "Payment Received",
       message: `${payment.amount} payment received successfully.`,
+    });
+
+    // Send payment success email
+    await sendPaymentSuccessEmail({
+      email: booking.customer.email,
+      customerName: booking.customer.name,
+      providerName: booking.provider.name,
+      amount: payment.amount,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
     });
 
     res.status(200).json({
@@ -193,7 +209,9 @@ export const refundPayment = async (req, res, next) => {
     payment.status = "refunded";
 
     // update booking
-    const booking = await Booking.findById(payment.booking);
+    const booking = await Booking.findById(payment.booking)
+      .populate("customer", "name email")
+      .populate("provider", "name email");
 
     if (booking) {
       booking.paymentStatus = "refunded";
@@ -206,6 +224,16 @@ export const refundPayment = async (req, res, next) => {
       type: "payment",
       title: "Refund Processed",
       messaeg: "Your payment has been refunded.",
+    });
+
+    // Send refund processed email
+    await sendRefundProcessedEmail({
+      email: booking.customer.email,
+      customerName: booking.customer.name,
+      providerName: booking.provider.name,
+      refundAmount: payment.amount,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
     });
 
     res.status(200).json({

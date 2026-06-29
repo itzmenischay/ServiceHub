@@ -4,6 +4,15 @@ import Availability from "../models/Availability.js";
 import { createNotification } from "../services/notificationService.js";
 import AppError from "../utils/AppError.js";
 
+import {
+  sendBookingCreatedEmail,
+  sendBookingAcceptedEmail,
+  sendBookingRejectedEmail,
+  sendBookingCancelledProviderEmail,
+  sendBookingCancelledCustomerEmail,
+  sendServiceCompletedEmail,
+} from "../services/emailService.js";
+
 const getDayName = (date) => {
   return new Date(date)
     .toLocaleDateString("en-US", {
@@ -47,7 +56,7 @@ export const createBooking = async (req, res, next) => {
     // Find provider profile
     const providerProfile = await ProviderProfile.findOne({
       user: providerId,
-    });
+    }).populate("user", "name email");
 
     if (!providerProfile) {
       return next(new AppError("Provider profile not found", 404));
@@ -166,6 +175,16 @@ export const createBooking = async (req, res, next) => {
       message: "You have received a new booking request.",
     });
 
+    // Send booking email
+    await sendBookingCreatedEmail({
+      email: req.user.email,
+      customerName: req.user.name,
+      providerName: providerProfile.user?.name || "Provider",
+      serviceDate,
+      startTime,
+      hours,
+    });
+
     res.status(201).json({
       success: true,
       message: "Booking created successfully",
@@ -220,10 +239,12 @@ export const getProviderBookings = async (req, res, next) => {
   }
 };
 
-// Accept Booking
+// Provider Accept Booking
 export const acceptBooking = async (req, res, next) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id)
+      .populate("customer", "name email")
+      .populate("provider", "name");
 
     if (!booking) {
       return next(new AppError("Booking not found", 404));
@@ -241,6 +262,16 @@ export const acceptBooking = async (req, res, next) => {
       message: "Your booking has been accepted.",
     });
 
+    // Send booking accepted email
+    await sendBookingAcceptedEmail({
+      email: booking.customer.email,
+      customerName: booking.customer.name,
+      providerName: booking.provider.name,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
+      hours: booking.hours,
+    });
+
     res.status(200).json({
       success: true,
       message: "Booking accepted",
@@ -251,10 +282,12 @@ export const acceptBooking = async (req, res, next) => {
   }
 };
 
-// Reject Booking
+// Provider Reject Booking
 export const rejectBooking = async (req, res, next) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id)
+      .populate("customer", "name email")
+      .populate("provider", "name");
 
     if (!booking) {
       return next(new AppError("Booking not found", 404));
@@ -272,6 +305,16 @@ export const rejectBooking = async (req, res, next) => {
       message: "Your booking request has been rejected.",
     });
 
+    // Send booking rejected email
+    await sendBookingRejectedEmail({
+      email: booking.customer.email,
+      customerName: booking.customer.name,
+      providerName: booking.provider.name,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
+      hours: booking.hours,
+    });
+
     res.status(200).json({
       success: true,
       message: "Booking rejected",
@@ -285,7 +328,9 @@ export const rejectBooking = async (req, res, next) => {
 // Complete Booking
 export const completeBooking = async (req, res, next) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id)
+      .populate("customer", "name email")
+      .populate("provider", "name");
 
     if (!booking) {
       return next(new AppError("Booking not found", 404));
@@ -303,6 +348,16 @@ export const completeBooking = async (req, res, next) => {
       message: "Your service has been marked as completed.",
     });
 
+    // Send service completed email
+    await sendServiceCompletedEmail({
+      email: booking.customer.email,
+      customerName: booking.customer.name,
+      providerName: booking.provider.name,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
+      hours: booking.hours,
+    });
+
     res.status(200).json({
       success: true,
       message: "Booking completed",
@@ -316,7 +371,9 @@ export const completeBooking = async (req, res, next) => {
 // Cancel Booking
 export const cancelBooking = async (req, res, next) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id)
+      .populate("customer", "name email")
+      .populate("provider", "name email");
 
     if (!booking) {
       return next(new AppError("Booking not found", 404));
@@ -332,6 +389,25 @@ export const cancelBooking = async (req, res, next) => {
       type: "booking",
       title: "Booking Cancelled",
       message: "A booking has been cancelled.",
+    });
+
+    // Send booking cancelled email
+    await sendBookingCancelledProviderEmail({
+      email: booking.provider.email,
+      providerName: booking.provider.name,
+      customerName: booking.customer.name,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
+      hours: booking.hours,
+    });
+
+    await sendBookingCancelledCustomerEmail({
+      email: booking.customer.email,
+      customerName: booking.customer.name,
+      providerName: booking.provider.name,
+      serviceDate: booking.serviceDate.toDateString(),
+      startTime: booking.startTime,
+      hours: booking.hours,
     });
 
     res.status(200).json({
