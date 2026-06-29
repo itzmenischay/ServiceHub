@@ -15,9 +15,13 @@ router.get("/me", protect, authorize("provider"), getMyAvailability);
 
 router.get("/provider/:providerId", getProviderAvailability);
 
-router
-  .route("/unavailable-date")
-  .post(protect, authorize("provider"), addUnavailableDate)
-  .delete(protect, authorize("provider"), removeUnavailableDate);
+// router
+//   .route("/unavailable-date")
+//   .post(protect, authorize("provider"), addUnavailableDate)
+//   .delete(protect, authorize("provider"), removeUnavailableDate);
+
+router.post("/unavailable-date", protect, authorize("provider"), addUnavailableDate)
+router.delete("/unavailable-date", protect, authorize("provider"), removeUnavailableDate)
+
 
 export default router;
