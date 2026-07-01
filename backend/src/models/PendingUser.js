@@ -36,6 +36,11 @@ const pendingUserSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+
+    lastSentAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,

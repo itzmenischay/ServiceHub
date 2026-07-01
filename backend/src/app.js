@@ -8,7 +8,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 // Utils Impots
 import AppError from "./utils/AppError.js";
 
-// Route imports
+// Route Imports
 import authRoutes from "./routes/authRoutes.js";
 import providerRoutes from "./routes/providerRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -20,7 +20,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import earningRoutes from "./routes/earningRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import availabilityRoutes from "./routes/availabilityRoutes.js"
+import availabilityRoutes from "./routes/availabilityRoutes.js";
 
 const app = express();
 
@@ -70,7 +70,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // Availability Routes
-app.use("/api/availability", availabilityRoutes)
+app.use("/api/availability", availabilityRoutes);
 
 // 404 handler
 app.all("/*splat", (req, res, next) => {

@@ -33,8 +33,45 @@ export const sendEmail = async ({ to, subject, html }) => {
 };
 
 // OTP Email
-export const sendOTPEmail = async (email, otp) => {
-  const { subject, html } = otpEmailTemplate(otp);
+export const sendOTPEmail = async (email, otp, purpose = "verification") => {
+  let subject;
+  let heading;
+  let message;
+
+  if (purpose === "verification") {
+    subject = "Verify Your ServiceHub Account";
+    heading = "Email Verification";
+    message = "Use the OTP below to verify your ServiceHub account.";
+  } else if (purpose === "passwordReset") {
+    subject = "Reset Your ServiceHub Password";
+    heading = "Password Reset";
+    message = "Use the OTP below to reset your ServiceHub account password.";
+  }
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+      <h2>${heading}</h2>
+
+      <p>${message}</p>
+
+      <h1 style="
+        letter-spacing: 8px;
+        background:#f4f4f4;
+        padding:20px;
+        text-align:center;
+      ">
+        ${otp}
+      </h1>
+
+      <p>This OTP will expire in <strong>10 minutes</strong>.</p>
+
+      <p>If you didn't request this, you can safely ignore this email.</p>
+
+      <hr>
+
+      <small>ServiceHub Team</small>
+    </div>
+  `;
 
   await sendEmail({
     to: email,
