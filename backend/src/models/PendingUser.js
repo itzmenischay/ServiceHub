@@ -47,6 +47,4 @@ const pendingUserSchema = new mongoose.Schema(
   },
 );
 
-const PendingUser = mongoose.model("PendingUser", pendingUserSchema);
-
-export default PendingUser;
+export default mongoose.model("PendingUser", pendingUserSchema);

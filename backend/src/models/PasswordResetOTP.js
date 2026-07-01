@@ -40,9 +40,4 @@ const passwordResetOTPSchema = new mongoose.Schema(
   },
 );
 
-const PasswordResetOTP = mongoose.model(
-  "PasswordResetOTP",
-  passwordResetOTPSchema,
-);
-
-export default PasswordResetOTP;
+export default mongoose.model("PasswordResetOTP", passwordResetOTPSchema);
