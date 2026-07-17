@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import "../config/env.js";
 
 // Email templates imports
@@ -12,24 +12,20 @@ import { serviceCompletedEmailTemplate } from "../templates/serviceCompletedEmai
 import { paymentSuccessEmailTemplate } from "../templates/paymentSuccessEmail.js";
 import { refundProcessedEmailTemplate } from "../templates/refundProcessedEmail.js";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Generic Email Sender
 export const sendEmail = async ({ to, subject, html }) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+  const { error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM,
     to,
     subject,
     html,
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 };
 
 // OTP Email
