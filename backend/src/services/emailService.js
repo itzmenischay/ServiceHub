@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import Brevo from "@getbrevo/brevo";
 import "../config/env.js";
 
 // Email templates imports
@@ -12,19 +12,45 @@ import { serviceCompletedEmailTemplate } from "../templates/serviceCompletedEmai
 import { paymentSuccessEmailTemplate } from "../templates/paymentSuccessEmail.js";
 import { refundProcessedEmailTemplate } from "../templates/refundProcessedEmail.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apiInstance = new Brevo.TransactionalEmailsApi();
+
+if (!process.env.BREVO_API_KEY) {
+  throw new Error("BREVO_API_KEY is missing");
+}
+
+if (!process.env.EMAIL_FROM) {
+  throw new Error("EMAIL_FROM is missing");
+}
+
+if (!process.env.EMAIL_FROM_NAME) {
+  throw new Error("EMAIL_FROM_NAME is missing");
+}
+
+apiInstance.setApiKey(
+  Brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY,
+);
 
 // Generic Email Sender
 export const sendEmail = async ({ to, subject, html }) => {
-  const { error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM,
-    to,
-    subject,
-    html,
-  });
+  try {
+    await apiInstance.sendTransacEmail({
+      sender: {
+        email: process.env.EMAIL_FROM,
+        name: process.env.EMAIL_FROM_NAME,
+      },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    });
+  } catch (error) {
+    console.error("Brevo Error:", {
+      message: error.message,
+      statusCode: error.statusCode,
+      body: error.body,
+    });
 
-  if (error) {
-    throw new Error(error.message);
+    throw new Error("Failed to send email");
   }
 };
 
