@@ -1,4 +1,4 @@
-import Brevo from "@getbrevo/brevo";
+import { BrevoClient } from "@getbrevo/brevo";
 import "../config/env.js";
 
 // Email templates imports
@@ -12,29 +12,24 @@ import { serviceCompletedEmailTemplate } from "../templates/serviceCompletedEmai
 import { paymentSuccessEmailTemplate } from "../templates/paymentSuccessEmail.js";
 import { refundProcessedEmailTemplate } from "../templates/refundProcessedEmail.js";
 
-const apiInstance = new Brevo.TransactionalEmailsApi();
-
 if (!process.env.BREVO_API_KEY) {
   throw new Error("BREVO_API_KEY is missing");
 }
-
 if (!process.env.EMAIL_FROM) {
   throw new Error("EMAIL_FROM is missing");
 }
-
 if (!process.env.EMAIL_FROM_NAME) {
   throw new Error("EMAIL_FROM_NAME is missing");
 }
 
-apiInstance.setApiKey(
-  Brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY,
-);
+const brevo = new BrevoClient({
+  apiKey: process.env.BREVO_API_KEY,
+});
 
 // Generic Email Sender
 export const sendEmail = async ({ to, subject, html }) => {
   try {
-    await apiInstance.sendTransacEmail({
+    await brevo.transactionalEmails.sendTransacEmail({
       sender: {
         email: process.env.EMAIL_FROM,
         name: process.env.EMAIL_FROM_NAME,
